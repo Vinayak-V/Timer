@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" class="transition duration-300">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Countdown Timer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    .dark .bg-switch {
+      background-image: url('https://wallpapers.com/images/high/neon-city-aesthetic-es9xitifkc617sid.webp');
+      background-size: cover;
+      background-position: center;
+    }
+  </style>
+</head>
+<body class="bg-switch h-screen flex items-center justify-center bg-gradient-to-r from-purple-500 to-indigo-500 dark:from-transparent dark:to-transparent font-sans transition duration-300">
+
+  <!-- Dark mode toggle -->
+  <div class="absolute top-6 right-6 z-10">
+    <label class="inline-flex items-center cursor-pointer">
+      <input type="checkbox" id="themeToggle" class="sr-only peer">
+      <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-500 rounded-full peer dark:bg-gray-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:after:bg-gray-300"></div>
+      <span class="ml-3 text-sm font-medium text-white dark:text-gray-200">Dark Mode</span>
+    </label>
+  </div>
+
+  <!-- Timer box -->
+  <div class="bg-white dark:bg-gray-900 dark:text-white rounded-2xl shadow-lg p-8 text-center w-80 border-2 border-blue-200 dark:border-gray-600">
+    <h1 class="text-2xl font-bold text-purple-700 dark:text-purple-300 mb-6">Countdown Timer</h1>
+
+    <input
+      id="secondsInput"
+      type="number"
+      placeholder="Enter seconds"
+      class="w-full border-2 border-indigo-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-center"
+    />
+
+    <div class="flex justify-between mb-6">
+      <button
+        id="pauseBtn"
+        class="bg-red-700 hover:bg-red-600 text-white font-semibold py-2 px-3 rounded-lg shadow transition duration-200"
+      >
+        Pause
+      </button>
+
+      <button
+        id="startBtn"
+        class="bg-yellow-500 hover:bg-yellow-400 text-white font-semibold py-2 px-3 rounded-lg shadow transition duration-200"
+      >
+        Start
+      </button>
+
+      <button
+        id="resumeBtn"
+        class="bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-3 rounded-lg shadow transition duration-200"
+      >
+        Resume
+      </button>
+    </div>
+
+    <div
+      id="timerDisplay"
+      class="bg-indigo-100 dark:bg-gray-700 text-indigo-800 dark:text-indigo-300 font-bold text-xl rounded-lg py-3"
+    >
+      00:00
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById("secondsInput");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resumeBtn = document.getElementById("resumeBtn");
+    const toggleSwitch = document.getElementById("themeToggle");
+
+    let countdownInterval;
+    let remainingSeconds = 0;
+    let isPaused = false;
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function startCountdown() {
+      clearInterval(countdownInterval);
+      let seconds = parseInt(input.value, 10);
+
+      if (isNaN(seconds) || seconds < 0) {
+        timerDisplay.textContent = "Invalid input 😅";
+        return;
+      }
+
+      remainingSeconds = seconds;
+      timerDisplay.textContent = formatTime(remainingSeconds);
+
+      countdownInterval = setInterval(() => {
+        if (!isPaused) {
+          if (remainingSeconds <= 0) {
+            clearInterval(countdownInterval);
+            timerDisplay.textContent = "Time's up! ⏰";
+            fireConfetti();
+            return;
+          }
+          remainingSeconds--;
+          timerDisplay.textContent = formatTime(remainingSeconds);
+        }
+      }, 1000);
+    }
+
+    function fireConfetti() {
+      confetti({
+        particleCount: 150,
+        spread: 90,
+        origin: { y: 0.6 }
+      });
+    }
+
+    startBtn.addEventListener("click", () => {
+      isPaused = false;
+      startCountdown();
+    });
+
+    pauseBtn.addEventListener("click", () => {
+      isPaused = true;
+    });
+
+    resumeBtn.addEventListener("click", () => {
+      isPaused = false;
+    });
+
+    toggleSwitch.addEventListener("change", () => {
+      document.documentElement.classList.toggle("dark");
+    });
+  </script>
+</body>
+</html>
